@@ -1,0 +1,38 @@
+### Starting build.
+# Target: main.ml.depends, tags: { package(batteries), package(str), extension:ml, file:main.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package batteries -package str -modules main.ml > main.ml.depends # cached
+# Target: hw1.ml.depends, tags: { package(batteries), package(str), extension:ml, file:hw1.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package batteries -package str -modules hw1.ml > hw1.ml.depends
+# Target: dfa.mli.depends, tags: { package(batteries), package(str), extension:mli, file:dfa.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package batteries -package str -modules dfa.mli > dfa.mli.depends # cached
+# Target: nfa.mli.depends, tags: { package(batteries), package(str), extension:mli, file:nfa.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package batteries -package str -modules nfa.mli > nfa.mli.depends # cached
+# Target: regex.ml.depends, tags: { package(batteries), package(str), extension:ml, file:regex.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package batteries -package str -modules regex.ml > regex.ml.depends # cached
+# Target: regex.cmo, tags: { package(batteries), package(str), byte, compile, extension:cmo, extension:ml, file:regex.cmo, file:regex.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package batteries -package str -o regex.cmo regex.ml # cached
+# Target: nfa.cmi, tags: { package(batteries), package(str), byte, compile, extension:mli, file:nfa.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package batteries -package str -o nfa.cmi nfa.mli # cached
+# Target: dfa.cmi, tags: { package(batteries), package(str), byte, compile, extension:mli, file:dfa.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package batteries -package str -o dfa.cmi dfa.mli # cached
+# Target: hw1.cmo, tags: { package(batteries), package(str), byte, compile, extension:cmo, extension:ml, file:hw1.cmo, file:hw1.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package batteries -package str -o hw1.cmo hw1.ml
+# Target: main.cmo, tags: { package(batteries), package(str), byte, compile, extension:cmo, extension:ml, file:main.cmo, file:main.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package batteries -package str -o main.cmo main.ml # cached
+# Target: dfa.ml.depends, tags: { package(batteries), package(str), extension:ml, file:dfa.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package batteries -package str -modules dfa.ml > dfa.ml.depends # cached
+# Target: nfa.ml.depends, tags: { package(batteries), package(str), extension:ml, file:nfa.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package batteries -package str -modules nfa.ml > nfa.ml.depends # cached
+# Target: regex.cmx, tags: { package(batteries), package(str), compile, extension:cmx, extension:ml, file:regex.cmx, file:regex.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -package batteries -package str -o regex.cmx regex.ml # cached
+# Target: nfa.cmx, tags: { package(batteries), package(str), compile, extension:cmx, extension:ml, file:nfa.cmx, file:nfa.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -package batteries -package str -o nfa.cmx nfa.ml # cached
+# Target: dfa.cmx, tags: { package(batteries), package(str), compile, extension:cmx, extension:ml, file:dfa.cmx, file:dfa.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -package batteries -package str -o dfa.cmx dfa.ml # cached
+# Target: hw1.cmx, tags: { package(batteries), package(str), compile, extension:cmx, extension:ml, file:hw1.cmx, file:hw1.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -package batteries -package str -o hw1.cmx hw1.ml
+# Target: main.cmx, tags: { package(batteries), package(str), compile, extension:cmx, extension:ml, file:main.cmx, file:main.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -package batteries -package str -o main.cmx main.ml # cached
+# Target: main.native, tags: { package(batteries), package(str), dont_link_with, extension:native, file:main.native, link, native, ocaml, program, quiet, traverse }
+ocamlfind ocamlopt -linkpkg -package batteries -package str regex.cmx nfa.cmx dfa.cmx hw1.cmx main.cmx -o main.native
+# Compilation successful.
