@@ -1,0 +1,16 @@
+### Starting build.
+# Target: main.ml.depends, tags: { package(batteries), package(str), extension:ml, file:main.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package batteries -package str -modules main.ml > main.ml.depends
+# Target: parse.ml.depends, tags: { package(batteries), package(str), extension:ml, file:parse.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package batteries -package str -modules parse.ml > parse.ml.depends # cached
+# Target: parse.cmo, tags: { package(batteries), package(str), byte, compile, extension:cmo, extension:ml, file:parse.cmo, file:parse.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package batteries -package str -o parse.cmo parse.ml # cached
+# Target: main.cmo, tags: { package(batteries), package(str), byte, compile, extension:cmo, extension:ml, file:main.cmo, file:main.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package batteries -package str -o main.cmo main.ml
+# Target: parse.cmx, tags: { package(batteries), package(str), compile, extension:cmx, extension:ml, file:parse.cmx, file:parse.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -package batteries -package str -o parse.cmx parse.ml # cached
+# Target: main.cmx, tags: { package(batteries), package(str), compile, extension:cmx, extension:ml, file:main.cmx, file:main.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -package batteries -package str -o main.cmx main.ml
+# Target: main.native, tags: { package(batteries), package(str), dont_link_with, extension:native, file:main.native, link, native, ocaml, program, quiet, traverse }
+ocamlfind ocamlopt -linkpkg -package batteries -package str parse.cmx main.cmx -o main.native
+# Compilation successful.
