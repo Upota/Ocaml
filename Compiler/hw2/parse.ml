@@ -5,6 +5,24 @@ type cfg = symbol list * symbol list * symbol * production
 type t = (symbol, symbol BatSet.t) BatMap.t  (* (symbol X, FIRST(X)) (symbol X, FOLLOW(X) ) *)
 type m = (symbol * symbol, production) BatMap.t (* parsing table *)
 
+let string_of_symbol a = match a with T s -> "T " ^ s | N s -> "N " ^ s | Epsilon -> "Epsilon " | End -> "End "
+let string_of_set set =
+  "{ " ^ (BatSet.fold (fun s str -> str ^ string_of_symbol s ^ ", ") set "") ^ " }"
+(* let string_of_list lst = 
+ "{ " ^ (List.fold (fun s str -> str ^ string_of_symbol s ^ ", ") lst "") ^ " }" *)
+
+let print
+=fun first ->
+    BatMap.iter (fun s states ->
+        prerr_endline (string_of_symbol s ^ " -> " ^ string_of_set states)) first;
+    prerr_endline ""
+
+let print_m
+=fun table ->
+    BatMap.iter (fun (s,a) states ->
+        prerr_endline ("M [ " ^string_of_symbol s ^ ", " ^ string_of_symbol a ^ " ] ")) table;
+    prerr_endline ""
+
 let rec check_LL1 : cfg -> bool
 =fun cfg -> 
     match cfg with
@@ -13,6 +31,9 @@ let rec check_LL1 : cfg -> bool
         let first = fix (compute_first n p) terminal_updated in
         let follow = fix (compute_follow p first) (update_t s (BatSet.singleton End) BatMap.empty) in
         let table = build_table first follow p BatMap.empty in
+        let _ = print first in
+        let _ = print follow in
+        let _ = print_m table in
         BatMap.for_all (fun x y -> if ((List.length y) > 1) then false else true) table
 
 and fix
