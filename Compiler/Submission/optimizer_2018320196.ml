@@ -321,6 +321,48 @@ and iter_for_blocks : blocks -> cfg -> Rda.t -> cfg
 		let updated_iter = List.filter (fun (bl',linst) -> if bl' > bl then true else false) b in
 		iter_for_blocks updated_iter g' inB 
 	| [] -> g
+
+(* and iter_for_uselst : T.var list -> blabel -> cfg -> Rda.t  -> cfg
+=fun uselst bl g inB  ->
+	let inBi_label = Rda.lookup bl inB in
+	let inBi = Rda.find_b inBi_label inB in
+	match uselst with
+	| v::tl ->
+		let doORnot = List.for_all (fun (_,(_,instr)) ->
+			match instr with
+			| T.ALLOC (x,n) -> if x = v then false else true
+			| ASSIGNV (x,o,y,z) -> if x = v then false else true
+			| ASSIGNC (x,o,y,n) -> if x = v then false else true
+			| ASSIGNU (x,o,y) -> if x = v then false else true
+			| COPY (x,y) -> if x = v then false else true   				
+			| LOAD (x,(x',y)) -> if x = v then false else true         			
+			| STORE ((x,y),x') -> if x = v then false else true
+			| READ x -> if x = v then false else true
+			| _ -> true
+		) inBi in
+		if not doORnot then iter_for_uselst tl bl g inB
+		else
+		let nlst = List.filter_map (fun (_,(_,instr)) ->
+			match instr with
+			| T.COPYC (x,n) -> if x = v then Some n else None
+			| _ -> None
+		) inBi in
+ 
+		(* let _ = print_endline ("----iter for uselst----") in
+		let _ = print_endline (string_of_int bl ^ " " ^ v ) in
+		let _ = List.iter (fun a -> print_endline (string_of_int a ^ " ; ")) nlst in *)
+
+		begin match nlst with
+		| [n] ->
+			let g' = do_const_prop g bl v n in
+			iter_for_uselst tl bl g' inB 
+		| n::tail -> if List.for_all (fun a -> if a = n then true else false) tail
+			then let g' = do_const_prop g bl v n in
+			iter_for_uselst tl bl g' inB 
+			else iter_for_uselst tl bl g inB 
+		| [] -> iter_for_uselst tl bl g inB
+		end
+	| [] -> g *)
 	
 and iter_for_uselst : T.var list -> blabel -> cfg -> Rda.t  -> cfg
 =fun uselst bl g inB  ->
@@ -402,6 +444,46 @@ and cp_iter_for_blocks : blocks -> cfg -> Rda.t -> cfg
 		cp_iter_for_blocks updated_iter g' inB
 		(* cp_iter_for_blocks tl g' inB *)
 	| [] -> g
+
+(* and cp_iter_for_uselst : T.var list -> blabel -> cfg -> Rda.t -> cfg
+=fun uselst bl g inB ->
+	match uselst with
+	| v::tl -> 
+		let doORnot = List.for_all (fun (_,(_,instr)) ->
+			match instr with
+			| T.ALLOC (x,n) -> if x = v then false else true
+			| ASSIGNV (x,o,y,z) -> if x = v then false else true
+			| ASSIGNC (x,o,y,n) -> if x = v then false else true
+			| ASSIGNU (x,o,y) -> if x = v then false else true
+			| COPYC (x,n) -> if x = v then false else true   				
+			| LOAD (x,(x',y)) -> if x = v then false else true         			
+			| STORE ((x,y),x') -> if x = v then false else true
+			| READ x -> if x = v then false else true
+			| _ -> true
+		) inBi in
+		if not doORnot then cp_iter_for_uselst tl bl g inBi
+		else
+		let dlst = List.filter_map (fun (_,(_,instr)) ->	(* v = d *)
+			match instr with
+			| T.COPY (x,d) -> if x = v then Some d else None
+			| _ -> None
+		) inBi in
+ 
+		(* let _ = print_endline ("----iter for uselst----") in
+		let _ = print_endline (string_of_int bl ^ " " ^ v ) in
+		let _ = List.iter (fun a -> print_endline (string_of_int a ^ " ; ")) nlst in *)
+
+		begin match dlst with
+		| [d] ->
+			let g' = do_copy_prop g bl v d in
+			iter_for_uselst tl bl g' inBi
+		| d::tail -> if List.for_all (fun a -> if a = d then true else false) tail
+			then let g' = do_copy_prop g bl v d in
+			iter_for_uselst tl bl g' inBi
+			else iter_for_uselst tl bl g inBi
+		| [] -> iter_for_uselst tl bl g inBi
+		end
+	| [] -> g *)
 
 and cp_iter_for_uselst : T.var list -> blabel -> cfg -> Rda.t -> cfg
 =fun uselst bl g inB ->
@@ -521,11 +603,12 @@ let optimize : T.program -> T.program
 	(* let cfg3 = deadcode_elimination const_cfg2 in *)
 	(* let res = copy_prop cfg in *)
 	(* let cfg2 = constant_prop cfg in *)
-	let cfg3 = copy_prop cfg in
-	let cfg4 = constant_prop cfg3 in
-	let cfg5 = deadcode_elimination cfg4 in
+	let cfg3 = constant_prop cfg in
+	let cfg4 = deadcode_elimination cfg3 in
+	let cfg5 = copy_prop cfg4 in
+	let cfg6 = deadcode_elimination cfg5 in
 
-	let (resultb,_) = cfg5 in
+	let (resultb,_) = cfg6 in
 
 	let b2t = List.map (fun (bl,linstr) -> linstr) resultb in
 
@@ -549,3 +632,6 @@ let optimize : T.program -> T.program
 	print_endline ("After const prop 2nd -> deadcode -> copy prop");
 	pp cfg5; *)
 	b2t
+
+(* let optimize : T.program -> T.program
+=fun t -> t *)

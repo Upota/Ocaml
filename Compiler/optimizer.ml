@@ -132,8 +132,8 @@ let rec least_fix
 	if equal (f a b) (a,b) then (a,b) else least_fix f equal (f a b)
 
 module Rda = struct
-	type t = (blabel * blabel list) list
-	let lookup s t = try List.assoc s t with _ -> []
+	type t = (blabel,blabel list) PMap.t
+	let lookup s t = try PMap.find s t with _ -> []
 	let find_b
 	= fun labellst mem -> 
 		List.filter (fun (bl1,_) -> 
@@ -169,25 +169,9 @@ module Rda = struct
 	let new_set b = List.rev_map (fun (bl,linst) -> (bl,[])) b
 	let rec compute_rda : cfg -> t * t			(*  in(B) * out(B) *)
 	=fun (b,e) ->
-		let inB = new_set b in
-		let outB = new_set b in
+		let inB = PMap.empty in
+		let outB = PMap.empty in
 		least_fix (update_set (b,e) b) ef (inB,outB)
-		(* let (i1,o1) = update_set (b,e) b [] [] in
-		let l2 = update_set (b,e) b i1 o1 in l2 *)
-		(* check_iter 5 (update_set (b,e) b) [] [] *)
-
-	(* and check_iter
-	=fun n f inB outB ->
-		match n with
-		| 0 -> (inB,outB)
-		| _ -> 
-			let (upin,upout) = f inB outB in
-			print_endline ("left " ^ string_of_int n);
-			print_endline ("----print in set----");
-			pp_rda_inout inB;
-			print_endline ("----print out set----");
-			pp_rda_inout outB;
-			check_iter (n-1) f upin upout *)
 
 	and update_set : cfg -> blocks -> t -> t -> t * t
 	=fun (b,e) iter inB outB ->
@@ -196,17 +180,13 @@ module Rda = struct
 			let up_inB = update_inB e bl inB outB in
 			let up_outB = update_outB b (bl,linstr) up_inB outB  in
 			update_set (b,e) tl up_inB up_outB
-		| [] -> 
-			let sorted_in = List.sort compare inB in
-			let sorted_out = List.sort compare outB in
-			(sorted_in,sorted_out)
+		| [] -> (inB,outB)
 	and update_inB : edges -> blabel -> t -> t -> t
 	=fun e bl inB outB ->
 		let prev = List.filter (fun (bl1,bl2) -> if bl2 = bl then true else false) e in
 		let inBi = bigunion prev outB [] in
-		List.rev_map (fun (bl',ls) -> 
-			if bl' = bl then (bl,inBi) else (bl',ls)
-		) inB
+		let inB' = PMap.remove bl inB
+		PMap.add bl inBi inB'
 	and update_outB : blocks -> block -> t -> t -> t
 	=fun mem (bl,linstr) inB outB ->
 		let inBi_labellst = lookup bl inB in
@@ -214,9 +194,8 @@ module Rda = struct
 		let x = defB (bl,linstr) in
 		let up_inBi = inBSUBkillB x inBi [] in
 		let outBi = List.sort_uniq compare ([bl]@up_inBi) in
-		List.rev_map (fun (bl',ls) -> 
-			if bl' = bl then (bl,outBi) else (bl',ls)
-		) outB
+		let outB' = PMap.remove bl outB
+		PMap.add bl outBi outB'
 		(* (bl,outBi)::(List.remove_assoc bl outB) *)
 	and inBSUBkillB : T.var list -> blocks -> blabel list -> blabel list
 	=fun lst inBi ret ->
@@ -236,9 +215,10 @@ module Rda = struct
 		| _ -> raise (Failure "exception")
 end
 
+
 module Lv = struct
-	type t = (blabel * T.var list) list
-	let lookup s t = try List.assoc s t with _ -> []
+	type t = (blabel, T.var list) PMap.t
+	let lookup s t = try PMap.find s t with _ -> []
 	let new_set b = List.rev_map (fun (bl,linst) -> (bl,[])) b
 	let rec ef
 	=fun (a,b) (a',b') ->
@@ -269,8 +249,8 @@ module Lv = struct
 		| [] -> lst
 	let rec compute_lv : cfg -> t * t
 	=fun (b,e) ->
-		let inB = new_set b in
-		let outB = new_set b in
+		let inB = PMap.empty in
+		let outB = PMap.empty in
 		least_fix (update_set b e) ef (inB,outB)
 	and update_set : blocks -> edges -> t -> t -> t * t
 	=fun b e inB outB ->
@@ -279,10 +259,7 @@ module Lv = struct
 			let up_inB = update_inB (bl,linstr) inB outB  in
 			let up_outB = update_outB e bl up_inB outB in
 			update_set tl e up_inB up_outB
-		| [] ->
-			let sorted_in = List.sort compare inB in
-			let sorted_out = List.sort compare outB in
-			(sorted_in,sorted_out)
+		| [] -> (inB,outB)
 	and update_inB : block -> t -> t -> t
 	=fun (bl,linstr) inB outB ->
 		let outBi = lookup bl outB in
@@ -292,18 +269,14 @@ module Lv = struct
 			| [d] -> List.filter (fun v -> if v = d then false else true) outBi
 			| _ -> outBi in
 		let inBi = List.sort_uniq compare (useB (bl,linstr))@up_outBi in
-		List.rev_map (fun (bl',ls) -> 
-			if bl' = bl then (bl,inBi) else (bl',ls)
-		) inB
-		(* (bl,inBi)::(List.remove_assoc bl inB) *)
+		let inB' = PMap.remove bl inB
+		PMap.add bl inBi inB'
 	and update_outB : edges -> blabel -> t -> t -> t
 	=fun e bl inB outB ->
 		let succ = List.filter (fun (bl1,bl2) -> if bl1 = bl then true else false) e in
 		let outBi = bigunion succ inB [] in
-		List.rev_map (fun (bl',ls) -> 
-			if bl' = bl then (bl,outBi) else (bl',ls)
-		) outB
-		(* (bl,outBi)::(List.remove_assoc bl outB) *)
+		let outB' = PMap.remove bl outB
+		PMap.add bl outBi outB'
 end
  
 let rec constant_prop : cfg -> cfg
@@ -321,6 +294,48 @@ and iter_for_blocks : blocks -> cfg -> Rda.t -> cfg
 		let updated_iter = List.filter (fun (bl',linst) -> if bl' > bl then true else false) b in
 		iter_for_blocks updated_iter g' inB 
 	| [] -> g
+
+(* and iter_for_uselst : T.var list -> blabel -> cfg -> Rda.t  -> cfg
+=fun uselst bl g inB  ->
+	let inBi_label = Rda.lookup bl inB in
+	let inBi = Rda.find_b inBi_label inB in
+	match uselst with
+	| v::tl ->
+		let doORnot = List.for_all (fun (_,(_,instr)) ->
+			match instr with
+			| T.ALLOC (x,n) -> if x = v then false else true
+			| ASSIGNV (x,o,y,z) -> if x = v then false else true
+			| ASSIGNC (x,o,y,n) -> if x = v then false else true
+			| ASSIGNU (x,o,y) -> if x = v then false else true
+			| COPY (x,y) -> if x = v then false else true   				
+			| LOAD (x,(x',y)) -> if x = v then false else true         			
+			| STORE ((x,y),x') -> if x = v then false else true
+			| READ x -> if x = v then false else true
+			| _ -> true
+		) inBi in
+		if not doORnot then iter_for_uselst tl bl g inB
+		else
+		let nlst = List.filter_map (fun (_,(_,instr)) ->
+			match instr with
+			| T.COPYC (x,n) -> if x = v then Some n else None
+			| _ -> None
+		) inBi in
+ 
+		(* let _ = print_endline ("----iter for uselst----") in
+		let _ = print_endline (string_of_int bl ^ " " ^ v ) in
+		let _ = List.iter (fun a -> print_endline (string_of_int a ^ " ; ")) nlst in *)
+
+		begin match nlst with
+		| [n] ->
+			let g' = do_const_prop g bl v n in
+			iter_for_uselst tl bl g' inB 
+		| n::tail -> if List.for_all (fun a -> if a = n then true else false) tail
+			then let g' = do_const_prop g bl v n in
+			iter_for_uselst tl bl g' inB 
+			else iter_for_uselst tl bl g inB 
+		| [] -> iter_for_uselst tl bl g inB
+		end
+	| [] -> g *)
 	
 and iter_for_uselst : T.var list -> blabel -> cfg -> Rda.t  -> cfg
 =fun uselst bl g inB  ->
@@ -402,6 +417,46 @@ and cp_iter_for_blocks : blocks -> cfg -> Rda.t -> cfg
 		cp_iter_for_blocks updated_iter g' inB
 		(* cp_iter_for_blocks tl g' inB *)
 	| [] -> g
+
+(* and cp_iter_for_uselst : T.var list -> blabel -> cfg -> Rda.t -> cfg
+=fun uselst bl g inB ->
+	match uselst with
+	| v::tl -> 
+		let doORnot = List.for_all (fun (_,(_,instr)) ->
+			match instr with
+			| T.ALLOC (x,n) -> if x = v then false else true
+			| ASSIGNV (x,o,y,z) -> if x = v then false else true
+			| ASSIGNC (x,o,y,n) -> if x = v then false else true
+			| ASSIGNU (x,o,y) -> if x = v then false else true
+			| COPYC (x,n) -> if x = v then false else true   				
+			| LOAD (x,(x',y)) -> if x = v then false else true         			
+			| STORE ((x,y),x') -> if x = v then false else true
+			| READ x -> if x = v then false else true
+			| _ -> true
+		) inBi in
+		if not doORnot then cp_iter_for_uselst tl bl g inBi
+		else
+		let dlst = List.filter_map (fun (_,(_,instr)) ->	(* v = d *)
+			match instr with
+			| T.COPY (x,d) -> if x = v then Some d else None
+			| _ -> None
+		) inBi in
+ 
+		(* let _ = print_endline ("----iter for uselst----") in
+		let _ = print_endline (string_of_int bl ^ " " ^ v ) in
+		let _ = List.iter (fun a -> print_endline (string_of_int a ^ " ; ")) nlst in *)
+
+		begin match dlst with
+		| [d] ->
+			let g' = do_copy_prop g bl v d in
+			iter_for_uselst tl bl g' inBi
+		| d::tail -> if List.for_all (fun a -> if a = d then true else false) tail
+			then let g' = do_copy_prop g bl v d in
+			iter_for_uselst tl bl g' inBi
+			else iter_for_uselst tl bl g inBi
+		| [] -> iter_for_uselst tl bl g inBi
+		end
+	| [] -> g *)
 
 and cp_iter_for_uselst : T.var list -> blabel -> cfg -> Rda.t -> cfg
 =fun uselst bl g inB ->
@@ -521,11 +576,12 @@ let optimize : T.program -> T.program
 	(* let cfg3 = deadcode_elimination const_cfg2 in *)
 	(* let res = copy_prop cfg in *)
 	(* let cfg2 = constant_prop cfg in *)
-	let cfg3 = copy_prop cfg in
-	let cfg4 = constant_prop cfg3 in
-	let cfg5 = deadcode_elimination cfg4 in
+	let cfg3 = constant_prop cfg in
+	let cfg4 = deadcode_elimination cfg3 in
+	let cfg5 = copy_prop cfg4 in
+	let cfg6 = deadcode_elimination cfg5 in
 
-	let (resultb,_) = cfg5 in
+	let (resultb,_) = cfg6 in
 
 	let b2t = List.map (fun (bl,linstr) -> linstr) resultb in
 
@@ -549,3 +605,6 @@ let optimize : T.program -> T.program
 	print_endline ("After const prop 2nd -> deadcode -> copy prop");
 	pp cfg5; *)
 	b2t
+
+(* let optimize : T.program -> T.program
+=fun t -> t *)
