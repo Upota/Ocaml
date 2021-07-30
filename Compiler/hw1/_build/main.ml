@@ -35,16 +35,16 @@ let testcases : (Regex.t * alphabet list) list =
     (CONCAT (Alpha A, CONCAT (Alpha B, CONCAT (STAR (CONCAT (Alpha A, CONCAT (Alpha A, Alpha B))), CONCAT (Alpha B, Alpha A)))), [A;B;A;A;B;A;B;B;A]);
 
     (CONCAT (STAR (OR (Alpha A, Alpha B)), Alpha A), [A;B;B;B;A;A]);
-    (CONCAT (STAR (OR (Alpha A, Alpha B)), Alpha A), [A;B;B;B;A;B]);
-    (STAR (CONCAT (Alpha A, STAR (Alpha B))), [A;B;B;B;A;A;B]);
-    (STAR (CONCAT (Alpha A, STAR (Alpha B))), [B;A;B;B;B;A;A;B]);
-    (STAR (CONCAT (OR (Alpha A, CONCAT (Alpha B, Alpha A)), Alpha B)), []);
-    (STAR (CONCAT (OR (Alpha A, CONCAT (Alpha B, Alpha A)), Alpha B)), [B;A;B;A;B]);
-    (STAR (CONCAT (OR (Alpha A, CONCAT (Alpha B, Alpha A)), Alpha B)), [A;B;B;A;A]);
-    (OR (CONCAT (OR (Alpha A, Epsilon), Alpha B), STAR(CONCAT (Alpha B, Alpha B))), [A;B]);
-    (OR (CONCAT (OR (Alpha A, Epsilon), Alpha B), STAR(CONCAT (Alpha B, Alpha B))), [A;A;B;A]);
-    (CONCAT (STAR (CONCAT (Alpha B, OR (STAR (Alpha A), Alpha B))), OR (CONCAT (Alpha B, STAR (Alpha A)), STAR (Alpha B))), [B;A;A;B;A;B;B;B;A]);
-    (CONCAT (STAR (CONCAT (Alpha B, OR (STAR (Alpha A), Alpha B))), OR (CONCAT (Alpha B, STAR (Alpha A)), STAR (Alpha B))), [A;B;B;A;B;A;A])
+    (CONCAT (STAR (OR (Alpha A, Alpha B)), Alpha A), [A;B;B;B;A;B]);
+    (STAR (CONCAT (Alpha A, STAR (Alpha B))), [A;B;B;B;A;A;B]);
+    (STAR (CONCAT (Alpha A, STAR (Alpha B))), [B;A;B;B;B;A;A;B]);
+    (STAR (CONCAT (OR (Alpha A, CONCAT (Alpha B, Alpha A)), Alpha B)), []);
+    (STAR (CONCAT (OR (Alpha A, CONCAT (Alpha B, Alpha A)), Alpha B)), [B;A;B;A;B]);
+    (STAR (CONCAT (OR (Alpha A, CONCAT (Alpha B, Alpha A)), Alpha B)), [A;B;B;A;A]);
+    (OR (CONCAT (OR (Alpha A, Epsilon), Alpha B), STAR(CONCAT (Alpha B, Alpha B))), [A;B]);
+    (OR (CONCAT (OR (Alpha A, Epsilon), Alpha B), STAR(CONCAT (Alpha B, Alpha B))), [A;A;B;A]);
+    (CONCAT (STAR (CONCAT (Alpha B, OR (STAR (Alpha A), Alpha B))), OR (CONCAT (Alpha B, STAR (Alpha A)), STAR (Alpha B))), [B;A;A;B;A;B;B;B;A]);
+    (CONCAT (STAR (CONCAT (Alpha B, OR (STAR (Alpha A), Alpha B))), OR (CONCAT (Alpha B, STAR (Alpha A)), STAR (Alpha B))), [A;B;B;A;B;A;A])
   ]
 
 let match_regex : Regex.t -> alphabet list -> bool

@@ -9,6 +9,25 @@ https://github.com/ocaml/ocaml
 
 This repository is the result of Programming Language and Compiler courses.  
 
+# Requirement
+Before you run any programs in this repository, you need to install opam and ocaml.  
+
+Following commands will install opam 2.0 and OCaml 4.08.1  
+
+<pre>
+    <code>
+    $ sudo add-apt-repository ppa:avsm/ppa
+    $ sudo apt update
+    $ sudo apt install build-essential
+    $ sudo apt install mercurial darcs m4 vim
+    $ sudo apt install opam
+    $ opam init --bare
+    $ eval $(opam env)
+    $ opam switch create compliler ocaml-base-compiler.4.08.1
+    $ eval $(opam env)
+    </code>
+</pre> 
+
 ## PL  
 Programming Language Assignments  
 

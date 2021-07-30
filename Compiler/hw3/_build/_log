@@ -1,2 +1,112 @@
 ### Starting build.
+# Target: main.ml.depends, tags: { package(batteries), package(str), extension:ml, file:main.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package batteries -package str -modules main.ml > main.ml.depends
+# Target: parse2.ml.depends, tags: { package(batteries), package(str), extension:ml, file:parse2.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package batteries -package str -modules parse2.ml > parse2.ml.depends
+# Target: parse2.cmo, tags: { package(batteries), package(str), byte, compile, extension:cmo, extension:ml, file:parse2.cmo, file:parse2.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package batteries -package str -o parse2.cmo parse2.ml
++ ocamlfind ocamlc -c -package batteries -package str -o parse2.cmo parse2.ml
+File "parse2.ml", line 222, characters 4-83:
+222 | ....match r with
+223 |     | DOT::hd::tl -> hd::DOT::tl
+224 |     | hd::tl -> hd::(move_dot tl)
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+[]
+File "parse2.ml", line 322, characters 4-53:
+322 | ....match s with
+323 |     | N a -> (N (a ^ "'"), s::[DOT])
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Epsilon|End|DOT|T _)
+File "parse2.ml", line 336, characters 4-136:
+336 | ....match x with
+337 |     | T a -> eval_table_shift (update_m (s,x) (S s') m1) e'
+338 |     | N a -> eval_table_shift (update_m (s,x) (G s') m1) e'
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Epsilon|End|DOT)
+File "parse2.ml", line 379, characters 4-79:
+379 | ....match lst with
+380 |     | hd::DOT::[] -> hd::[]
+381 |     | hd::tl -> hd::(getrule tl)
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+[]
+File "parse2.ml", line 411, characters 8-655:
+411 | ........begin match look with
+412 |         | [] -> false
+413 |         | [S a] -> parsing (a::hd::tl) t table
+414 |         | [G a] -> parsing (a::hd::tl) input table
+415 |         | [ACC] -> true
+...
+426 |                 end
+427 |             | [] -> false
+428 |             end
+429 |         end
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(R _::_::_|ACC::_::_|G _::_::_|S _::_::_)
+File "parse2.ml", line 436, characters 4-57:
+436 | ....match stack with
+437 |     | hd::tl -> stack_poped tl (i-1)
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+[]
+# Target: main.cmo, tags: { package(batteries), package(str), byte, compile, extension:cmo, extension:ml, file:main.cmo, file:main.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package batteries -package str -o main.cmo main.ml
+# Target: parse2.cmx, tags: { package(batteries), package(str), compile, extension:cmx, extension:ml, file:parse2.cmx, file:parse2.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -package batteries -package str -o parse2.cmx parse2.ml
++ ocamlfind ocamlopt -c -package batteries -package str -o parse2.cmx parse2.ml
+File "parse2.ml", line 222, characters 4-83:
+222 | ....match r with
+223 |     | DOT::hd::tl -> hd::DOT::tl
+224 |     | hd::tl -> hd::(move_dot tl)
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+[]
+File "parse2.ml", line 322, characters 4-53:
+322 | ....match s with
+323 |     | N a -> (N (a ^ "'"), s::[DOT])
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Epsilon|End|DOT|T _)
+File "parse2.ml", line 336, characters 4-136:
+336 | ....match x with
+337 |     | T a -> eval_table_shift (update_m (s,x) (S s') m1) e'
+338 |     | N a -> eval_table_shift (update_m (s,x) (G s') m1) e'
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Epsilon|End|DOT)
+File "parse2.ml", line 379, characters 4-79:
+379 | ....match lst with
+380 |     | hd::DOT::[] -> hd::[]
+381 |     | hd::tl -> hd::(getrule tl)
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+[]
+File "parse2.ml", line 411, characters 8-655:
+411 | ........begin match look with
+412 |         | [] -> false
+413 |         | [S a] -> parsing (a::hd::tl) t table
+414 |         | [G a] -> parsing (a::hd::tl) input table
+415 |         | [ACC] -> true
+...
+426 |                 end
+427 |             | [] -> false
+428 |             end
+429 |         end
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(R _::_::_|ACC::_::_|G _::_::_|S _::_::_)
+File "parse2.ml", line 436, characters 4-57:
+436 | ....match stack with
+437 |     | hd::tl -> stack_poped tl (i-1)
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+[]
+# Target: main.cmx, tags: { package(batteries), package(str), compile, extension:cmx, extension:ml, file:main.cmx, file:main.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -package batteries -package str -o main.cmx main.ml
+# Target: main.native, tags: { package(batteries), package(str), dont_link_with, extension:native, file:main.native, link, native, ocaml, program, quiet, traverse }
+ocamlfind ocamlopt -linkpkg -package batteries -package str parse2.cmx main.cmx -o main.native
 # Compilation successful.
