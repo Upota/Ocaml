@@ -60,5 +60,5 @@ You can run as follows:
 </pre> 
 
 ## Parser_Generator
-Practice of using ocamlyacc that is a parset generator for OCaml.  
+Practic of using ocamlyacc which is a parser generator for OCaml.  
 
