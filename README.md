@@ -12,7 +12,7 @@ This repository is the result of Programming Language and Compiler courses.
 # Requirement
 Before you run any programs in this repository, you need to install opam and ocaml.  
 
-Following commands will install opam 2.0 and OCaml 4.08.1  
+Following commands will install opam 2.0 and OCaml 4.08.1.  
 
 <pre>
     <code>
